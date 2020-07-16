@@ -1,0 +1,134 @@
+#!/bin/sh
+
+set -e
+cd $(dirname $0)
+
+FLUENTD_CONFIG=/etc/fluentd/fluentd.conf
+
+
+
+if [ -f "$FLUENTD_CONFIG" ]; then
+    exit
+fi
+
+mkdir -p /etc/fluentd
+echo "@include conf.d/*.conf" >> $FLUENTD_CONFIG
+
+
+bufferd_output(){
+cat << EOF
+${FLUENTD_BUFFER_TYPE:+buffer_type $FLUENTD_BUFFER_TYPE}
+${FLUENTD_BUFFER_CHUNK_LIMIT:+buffer_chunk_limit $FLUENTD_BUFFER_CHUNK_LIMIT}
+${FLUENTD_BUFFER_QUEUE_LIMIT:+buffer_queue_limit $FLUENTD_BUFFER_QUEUE_LIMIT}
+${FLUENTD_BUFFER_CHUNK_LIMIT_SIZE:+chunk_limit_size ${FLUENTD_BUFFER_CHUNK_LIMIT_SIZE}}
+${FLUENTD_BUFFER_TOTAL_LIMIT_SIZE:+total_limit_size ${FLUENTD_BUFFER_TOTAL_LIMIT_SIZE}}
+${FLUENTD_BUFFER_CHUNK_FULL_THRESHOLD:+chunk_full_threshold ${FLUENTD_BUFFER_CHUNK_FULL_THRESHOLD}}
+${FLUENTD_BUFFER_COMPRESS:+compress ${FLUENTD_BUFFER_COMPRESS}}
+${FLUENTD_FLUSH_INTERVAL:+flush_interval $FLUENTD_FLUSH_INTERVAL}
+${FLUENTD_FLUSH_MODE:+flush_mode ${FLUENTD_FLUSH_MODE}}
+${FLUENTD_FLUSH_THREAD_COUNT:+flush_thread_count ${FLUENTD_FLUSH_THREAD_COUNT}}
+${FLUENTD_FLUSH_AT_SHUTDOWN:+flush_at_shutdown $FLUENTD_FLUSH_AT_SHUTDOWN}
+${FLUENTD_DISABLE_RETRY_LIMIT:+disable_retry_limit $FLUENTD_DISABLE_RETRY_LIMIT}
+${FLUENTD_RETRY_LIMIT:+retry_limit $FLUENTD_RETRY_LIMIT}
+${FLUENTD_RETRY_WAIT:+retry_wait $FLUENTD_RETRY_WAIT}
+${FLUENTD_MAX_RETRY_WAIT:+max_retry_wait $FLUENTD_MAX_RETRY_WAIT}
+${FLUENTD_NUM_THREADS:+num_threads $FLUENTD_NUM_THREADS}
+EOF
+}
+
+fluentd_options(){
+cat >> $FLUENTD_CONFIG << EOF
+<system>
+${FLUENTD_LOG_LEVEL:+log_level $FLUENTD_LOG_LEVEL}
+</system>
+EOF
+if [ "$FLUENTD_ENABLE_MONITOR" == "true" ]; then
+cat >> $FLUENTD_CONFIG << EOF
+<source>
+    @type monitor_agent
+    bind 0.0.0.0
+    port 24220
+</source>
+EOF
+fi
+}
+
+assert_not_empty(){
+    arg=$1
+    shift
+    if [ -z "$arg" ]; then
+        echo "$@"
+        exit 1
+    fi
+}
+
+es(){
+if [ -f "/run/secrets/es_credential" ];then
+    ELASTICSEARCH_USER=$(cat /run/secrets/es_credential | awk -F":" '{ print $1 }')
+    ELASTICSEARCH_PASSWORD=$(cat /run/secrets/es_credential | awk -F":" '{ print $2 }')
+fi
+
+if [ -z "$ELASTICSEARCH_HOSTS" ]; then
+    assert_not_empty "$ELASTICSEARCH_HOST" "ELASTICSEARCH_HOST required"
+    assert_not_empty "$ELASTICSEARCH_PORT" "ELASTICSEARCH_PORT required"
+    ELASTICSEARCH_HOSTS="$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT"
+fi
+
+cat >> $FLUENTD_CONFIG << EOF
+<match docker.**>
+@type elasticsearch
+hosts $ELASTICSEARCH_HOSTS
+reconnect_on_error true
+${ELASTICSEARCH_USER:+user ${ELASTICSEARCH_USER}}
+${ELASTICSEARCH_PASSWORD:+password ${ELASTICSEARCH_PASSWORD}}
+${ELASTICSEARCH_PATH:+path ${ELASTICSEARCH_PATH}}
+${ELASTICSEARCH_SCHEME:+scheme ${ELASTICSEARCH_SCHEME}}
+${ELASTICSEARCH_SSL_VERIFY:+ssl_verify ${ELASTICSEARCH_SSL_VERIFY}}
+target_index_key _target
+type_name fluentd
+$(bufferd_output)
+</match>
+EOF
+}
+
+default(){
+echo "use default output"
+cat >> $FLUENTD_CONFIG << EOF
+<match docker.**>
+@type stdout
+</match>
+EOF
+}
+
+
+null(){
+cat >> $FLUENTD_CONFIG << EOF
+<match docker.**>
+@type null
+</match>
+EOF
+}
+
+
+if [ -n "$FLUENTD_OUTPUT" ]; then
+    LOGGING_OUTPUT="$FLUENTD_OUTPUT"
+fi
+
+case "$LOGGING_OUTPUT" in
+    elasticsearch)
+        es;;
+    null)
+        null;;
+    *)
+        default
+esac
+
+fluentd_options
+
+
+
+
+
+
+
+

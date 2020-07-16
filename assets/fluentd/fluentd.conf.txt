@@ -1,0 +1,16 @@
+@include conf.d/*.conf
+<match docker.**>
+@type elasticsearch
+hosts http://elasticsearch-logging.kube-system:9200
+reconnect_on_error true
+
+
+
+
+
+target_index_key _target
+type_name fluentd
+</match>
+<system>
+
+</system>

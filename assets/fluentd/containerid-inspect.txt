@@ -1,0 +1,275 @@
+[root@10 ~]# docker inspect e9c10e2009bd
+[
+    {
+        "Id": "e9c10e2009bde307920330dc86aa812f6113172366e46bad5105502edad68355",
+        "Created": "2020-07-14T05:49:59.514681448Z",
+        "Path": "catalina.sh",
+        "Args": [
+            "run"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 126477,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2020-07-14T05:49:59.750891271Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:bd99a03c66bad64aba27eea90d83779000769fda7d559b7a4fa5328eaa99a1fb",
+        "ResolvConfPath": "/var/lib/docker/containers/bb8c57596762fb4ba1c2655b5b7e8d824fbe6a4b45d11084b57f68820770438c/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/bb8c57596762fb4ba1c2655b5b7e8d824fbe6a4b45d11084b57f68820770438c/hostname",
+        "HostsPath": "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/etc-hosts",
+        "LogPath": "/var/lib/docker/containers/e9c10e2009bde307920330dc86aa812f6113172366e46bad5105502edad68355/e9c10e2009bde307920330dc86aa812f6113172366e46bad5105502edad68355-json.log",
+        "Name": "/k8s_tomcat_tomcat_default_d9ff9d69-c595-11ea-92c6-00505692039f_0",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/volumes/kubernetes.io~empty-dir/tomcat-log:/usr/local/tomcat/logs",
+                "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/volumes/kubernetes.io~secret/default-token-xj6xf:/var/run/secrets/kubernetes.io/serviceaccount:ro",
+                "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/etc-hosts:/etc/hosts",
+                "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/containers/tomcat/cffe904e:/dev/termination-log"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {
+                    "max-file": "3",
+                    "max-size": "10m"
+                }
+            },
+            "NetworkMode": "container:bb8c57596762fb4ba1c2655b5b7e8d824fbe6a4b45d11084b57f68820770438c",
+            "PortBindings": null,
+            "RestartPolicy": {
+                "Name": "",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "container:bb8c57596762fb4ba1c2655b5b7e8d824fbe6a4b45d11084b57f68820770438c",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 1000,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": [
+                "seccomp=unconfined"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 2,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "/kubepods/besteffort/podd9ff9d69-c595-11ea-92c6-00505692039f",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 100000,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": [
+                {
+                    "Name": "nofile",
+                    "Hard": 655350,
+                    "Soft": 655350
+                }
+            ],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/asound",
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/ddef98f341dfd54c0a5bd5f1e140c48e1cc699d4f3bdbe08348c115ff9eeb21c-init/diff:/var/lib/docker/overlay2/f9e22578b02c06eaac56535b208e354d0f2d5ac2d76e3980d14c1fb18d575f32/diff:/var/lib/docker/overlay2/ba3549c05edd2ffdc40c61d7e7fe87522355b24f439fcbf9033ae755988ef53a/diff:/var/lib/docker/overlay2/83e473e9def09e211622a517771ac8a87b87b0fdef2b0fdf482a9ed2dca48bee/diff:/var/lib/docker/overlay2/291dbe37a8afa349b3d2de3a5e31ab24608d36a7f7aaa5bdf234592941bda4ab/diff:/var/lib/docker/overlay2/a34bfc6d75a1d0d93cd0056cb11fa73c2ee998fb65f6622300dea3abf8c01759/diff:/var/lib/docker/overlay2/014d5c1f1b69b6c4fb8a2ae8b3f4020b392ee519a47a5e1412a04993c72236a9/diff:/var/lib/docker/overlay2/057f6439c42ea261f0fc7ed02f5e485aa7dd74bdcd32ac7e5626db31ad4d8a66/diff:/var/lib/docker/overlay2/24be499a7f4f3e16cc41cedaf64586a7ee0af2b1642abbf96ae9d7cab6248e45/diff",
+                "MergedDir": "/var/lib/docker/overlay2/ddef98f341dfd54c0a5bd5f1e140c48e1cc699d4f3bdbe08348c115ff9eeb21c/merged",
+                "UpperDir": "/var/lib/docker/overlay2/ddef98f341dfd54c0a5bd5f1e140c48e1cc699d4f3bdbe08348c115ff9eeb21c/diff",
+                "WorkDir": "/var/lib/docker/overlay2/ddef98f341dfd54c0a5bd5f1e140c48e1cc699d4f3bdbe08348c115ff9eeb21c/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/etc-hosts",
+                "Destination": "/etc/hosts",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/containers/tomcat/cffe904e",
+                "Destination": "/dev/termination-log",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/volumes/kubernetes.io~empty-dir/tomcat-log",
+                "Destination": "/usr/local/tomcat/logs",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/var/lib/kubelet/pods/d9ff9d69-c595-11ea-92c6-00505692039f/volumes/kubernetes.io~secret/default-token-xj6xf",
+                "Destination": "/var/run/secrets/kubernetes.io/serviceaccount",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "tomcat",
+            "Domainname": "",
+            "User": "0",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "8080/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "aliyun_logs_catalina=stdout",
+                "aliyun_logs_access=/usr/local/tomcat/logs/catalina.*.log",
+                "KUBERNETES_PORT=tcp://10.96.0.1:443",
+                "KUBERNETES_PORT_443_TCP=tcp://10.96.0.1:443",
+                "KUBERNETES_PORT_443_TCP_PROTO=tcp",
+                "KUBERNETES_PORT_443_TCP_PORT=443",
+                "KUBERNETES_PORT_443_TCP_ADDR=10.96.0.1",
+                "KUBERNETES_SERVICE_HOST=10.96.0.1",
+                "KUBERNETES_SERVICE_PORT=443",
+                "KUBERNETES_SERVICE_PORT_HTTPS=443",
+                "PATH=/usr/local/tomcat/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin",
+                "LANG=C.UTF-8",
+                "JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk/jre",
+                "JAVA_VERSION=8u131",
+                "JAVA_ALPINE_VERSION=8.131.11-r2",
+                "CATALINA_HOME=/usr/local/tomcat",
+                "TOMCAT_NATIVE_LIBDIR=/usr/local/tomcat/native-jni-lib",
+                "LD_LIBRARY_PATH=/usr/local/tomcat/native-jni-lib",
+                "GPG_KEYS=05AB33110949707C93A279E3D3EFE6B686867BA6 07E48665A34DCAFAE522E5E6266191C37C037D42 47309207D818FFD8DCD3F83F1931D684307A10A5 541FBE7D8F78B25E055DDEE13C370389288584E7 61B832AC2F1C5A90F0F9B00A1C506407564C17A3 713DA88BE50911535FE716F5208B0AB1D63011C7 79F7026C690BAA50B92CD8B66A3AD3F4F22C4FED 9BA44C2621385CB966EBA586F72C284D731FABEE A27677289986DB50844682F8ACB77FC2E86E29AC A9C5DF4D22E99998D9875A5110C01C5A2F6059E7 DCFD35E0BF8CA7344752DE8B6FB21E8933C60243 F3A04C595DB5B6A5F1ECA43E3B7BBB100D811BBE F7DA48BB64BCB84ECBA7EE6935CD23C10D498E23",
+                "TOMCAT_MAJOR=8",
+                "TOMCAT_VERSION=8.0.45",
+                "TOMCAT_TGZ_URL=https://www.apache.org/dyn/closer.cgi?action=download&filename=tomcat/tomcat-8/v8.0.45/bin/apache-tomcat-8.0.45.tar.gz",
+                "TOMCAT_ASC_URL=https://www.apache.org/dist/tomcat/tomcat-8/v8.0.45/bin/apache-tomcat-8.0.45.tar.gz.asc"
+            ],
+            "Cmd": [
+                "catalina.sh",
+                "run"
+            ],
+            "Healthcheck": {
+                "Test": [
+                    "NONE"
+                ]
+            },
+            "ArgsEscaped": true,
+            "Image": "sha256:bd99a03c66bad64aba27eea90d83779000769fda7d559b7a4fa5328eaa99a1fb",
+            "Volumes": null,
+            "WorkingDir": "/usr/local/tomcat",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "annotation.io.kubernetes.container.hash": "85b90ae9",
+                "annotation.io.kubernetes.container.restartCount": "0",
+                "annotation.io.kubernetes.container.terminationMessagePath": "/dev/termination-log",
+                "annotation.io.kubernetes.container.terminationMessagePolicy": "File",
+                "annotation.io.kubernetes.pod.terminationGracePeriod": "30",
+                "io.kubernetes.container.logpath": "/var/log/pods/d9ff9d69-c595-11ea-92c6-00505692039f/tomcat/0.log",
+                "io.kubernetes.container.name": "tomcat",
+                "io.kubernetes.docker.type": "container",
+                "io.kubernetes.pod.name": "tomcat",
+                "io.kubernetes.pod.namespace": "default",
+                "io.kubernetes.pod.uid": "d9ff9d69-c595-11ea-92c6-00505692039f",
+                "io.kubernetes.sandbox.id": "bb8c57596762fb4ba1c2655b5b7e8d824fbe6a4b45d11084b57f68820770438c"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {}
+        }
+    }
+]

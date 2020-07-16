@@ -3,7 +3,6 @@ package pilot
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 // Global variables for piloter
@@ -30,10 +29,10 @@ type Piloter interface {
 }
 
 // NewPiloter instantiates a new piloter
-func NewPiloter(baseDir string) (Piloter, error) {
-	if os.Getenv(ENV_PILOT_TYPE) == PILOT_FILEBEAT {
+func NewPiloter() (Piloter, error) {
+	/*if os.Getenv(ENV_PILOT_TYPE) == PILOT_FILEBEAT {
 		return NewFilebeatPiloter(baseDir)
-	}
+	}*/
 	if os.Getenv(ENV_PILOT_TYPE) == PILOT_FLUENTD {
 		return NewFluentdPiloter()
 	}
@@ -41,7 +40,7 @@ func NewPiloter(baseDir string) (Piloter, error) {
 }
 
 // CustomConfig custom config
-func CustomConfig(name string, customConfigs map[string]string, logConfig *LogConfig) {
+/*func CustomConfig(name string, customConfigs map[string]string, logConfig *LogConfig) {
 	if os.Getenv(ENV_PILOT_TYPE) == PILOT_FILEBEAT {
 		fields := make(map[string]string)
 		configs := make(map[string]string)
@@ -59,4 +58,4 @@ func CustomConfig(name string, customConfigs map[string]string, logConfig *LogCo
 		logConfig.CustomFields = fields
 		logConfig.CustomConfigs = configs
 	}
-}
+}*/

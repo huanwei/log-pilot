@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -18,8 +17,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/mount"
-	k8s "github.com/docker/docker/client"
+	docker "github.com/docker/docker/client"
 	"golang.org/x/net/context"
 )
 
@@ -37,15 +35,15 @@ const (
 	ENV_SERVICE_LOGS_TEMPL                  = "%s_logs_"
 	ENV_SERVICE_LOGS_CUSTOME_CONFIG_TEMPL   = "%s_logs_custom_config"
 	LABEL_SERVICE_LOGS_TEMPL                = "%s.logs."
-	LABEL_SERVICE_LOGS_CUSTOME_CONFIG_TEMPL = "%s.logs.custom.config"
-	LABEL_PROJECT_SWARM_MODE                = "com.docker.stack.namespace"
-	LABEL_PROJECT                           = "com.docker.compose.project"
-	LABEL_SERVICE                           = "com.docker.compose.service"
-	LABEL_SERVICE_SWARM_MODE                = "com.docker.swarm.service.name"
+	//LABEL_SERVICE_LOGS_CUSTOME_CONFIG_TEMPL = "%s.logs.custom.config"
+	//LABEL_PROJECT_SWARM_MODE                = "com.docker.stack.namespace"
+	//LABEL_PROJECT                           = "com.docker.compose.project"
+	//LABEL_SERVICE                           = "com.docker.compose.service"
+	//LABEL_SERVICE_SWARM_MODE                = "com.docker.swarm.service.name"
 	LABEL_K8S_POD_NAMESPACE                 = "io.kubernetes.pod.namespace"
 	LABEL_K8S_CONTAINER_NAME                = "io.kubernetes.container.name"
 	LABEL_POD                               = "io.kubernetes.pod.name"
-	SYMLINK_LOGS_BASE                       = "/acs/log/"
+	//SYMLINK_LOGS_BASE                       = "/acs/log/"
 
 	ERR_ALREADY_STARTED = "already started"
 )
@@ -55,13 +53,13 @@ type Pilot struct {
 	piloter       Piloter
 	mutex         sync.Mutex
 	templ         *template.Template
-	client        *k8s.Client
+	client        *docker.Client
 	lastReload    time.Time
 	reloadChan    chan bool
 	stopChan      chan bool
 	baseDir       string
 	logPrefix     []string
-	createSymlink bool
+	//createSymlink bool
 }
 
 // Run start log pilot
@@ -75,32 +73,34 @@ func Run(templ string, baseDir string) error {
 
 // New returns a log pilot instance
 func New(tplStr string, baseDir string) (*Pilot, error) {
+	//读入容器fluentd日志采集基础模板"fluentd.tpl"
 	templ, err := template.New("pilot").Parse(tplStr)
 	if err != nil {
 		return nil, err
 	}
 
-	if os.Getenv("DOCKER_API_VERSION") == "" {
+	/*if os.Getenv("DOCKER_API_VERSION") == "" {
 		os.Setenv("DOCKER_API_VERSION", "1.23")
-	}
+	}*/
 
-	client, err := k8s.NewEnvClient()
+	//创建本地宿主机Docker Client
+	client, err := docker.NewEnvClient()
 	if err != nil {
 		return nil, err
 	}
 
-	piloter, err := NewPiloter(baseDir)
+	piloter, err := NewPiloter()
 	if err != nil {
 		return nil, err
 	}
 
 	logPrefix := []string{"aliyun"}
-	if os.Getenv(ENV_PILOT_LOG_PREFIX) != "" {
+	/*if os.Getenv(ENV_PILOT_LOG_PREFIX) != "" {
 		envLogPrefix := os.Getenv(ENV_PILOT_LOG_PREFIX)
 		logPrefix = strings.Split(envLogPrefix, ",")
-	}
+	}*/
 
-	createSymlink := os.Getenv(ENV_PILOT_CREATE_SYMLINK) == "true"
+	//createSymlink := os.Getenv(ENV_PILOT_CREATE_SYMLINK) == "true"
 	return &Pilot{
 		client:        client,
 		templ:         templ,
@@ -109,23 +109,29 @@ func New(tplStr string, baseDir string) (*Pilot, error) {
 		stopChan:      make(chan bool),
 		piloter:       piloter,
 		logPrefix:     logPrefix,
-		createSymlink: createSymlink,
+		//createSymlink: createSymlink,
 	}, nil
 }
 
 func (p *Pilot) watch() error {
+	//全量清理/etc/fluentd/conf.d/下所有配置文件
 	if err := p.cleanConfigs(); err != nil {
 		return err
 	}
 
+	//启动fluentd进程
 	err := p.piloter.Start()
 	if err != nil && ERR_ALREADY_STARTED != err.Error() {
 		return err
 	}
 
+	//todo: check fluentd status
+
+	//启动reload协程
 	p.lastReload = time.Now()
 	go p.doReload()
 
+	//启动watch docker event的协程
 	ctx := context.Background()
 	filter := filters.NewArgs()
 	filter.Add("type", "container")
@@ -160,6 +166,7 @@ func (p *Pilot) watch() error {
 	}()
 
 	time.Sleep(time.Second * 1)
+	//再次批量处理
 	if err := p.processAllContainers(); err != nil {
 		return err
 	}
@@ -257,10 +264,12 @@ func (p *Pilot) processAllContainers() error {
 		}
 	}
 
-	return p.processSymlink(containerIDs)
+	return nil
+
+	//return p.processSymlink(containerIDs)
 }
 
-func (p *Pilot) processSymlink(existingContainerIDs map[string]string) error {
+/*func (p *Pilot) processSymlink(existingContainerIDs map[string]string) error {
 	symlinkContainerIDs := p.listAllSymlinkContainer()
 	for containerID := range symlinkContainerIDs {
 		if _, ok := existingContainerIDs[containerID]; !ok {
@@ -268,9 +277,9 @@ func (p *Pilot) processSymlink(existingContainerIDs map[string]string) error {
 		}
 	}
 	return nil
-}
+}*/
 
-func (p *Pilot) listAllSymlinkContainer() map[string]string {
+/*func (p *Pilot) listAllSymlinkContainer() map[string]string {
 	containerIDs := make(map[string]string, 0)
 	linkBaseDir := path.Join(p.baseDir, SYMLINK_LOGS_BASE)
 	if _, err := os.Stat(linkBaseDir); err != nil && os.IsNotExist(err) {
@@ -292,8 +301,9 @@ func (p *Pilot) listAllSymlinkContainer() map[string]string {
 		}
 	}
 	return containerIDs
-}
+}*/
 
+/*
 func listSubDirectory(path string) []string {
 	subdirs := make([]string, 0)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -312,7 +322,7 @@ func listSubDirectory(path string) []string {
 		}
 	}
 	return subdirs
-}
+}*/
 
 func putIfNotEmpty(store map[string]string, key, value string) {
 	if key == "" || value == "" {
@@ -324,16 +334,18 @@ func putIfNotEmpty(store map[string]string, key, value string) {
 func container(containerJSON *types.ContainerJSON) map[string]string {
 	labels := containerJSON.Config.Labels
 	c := make(map[string]string)
-	putIfNotEmpty(c, "docker_app", labels[LABEL_PROJECT])
-	putIfNotEmpty(c, "docker_app", labels[LABEL_PROJECT_SWARM_MODE])
-	putIfNotEmpty(c, "docker_service", labels[LABEL_SERVICE])
-	putIfNotEmpty(c, "docker_service", labels[LABEL_SERVICE_SWARM_MODE])
+	//putIfNotEmpty(c, "docker_app", labels[LABEL_PROJECT])
+	//putIfNotEmpty(c, "docker_app", labels[LABEL_PROJECT_SWARM_MODE])
+	//putIfNotEmpty(c, "docker_service", labels[LABEL_SERVICE])
+	//putIfNotEmpty(c, "docker_service", labels[LABEL_SERVICE_SWARM_MODE])
+
+	// containerid.conf中添加的tag名称, 参考docker inspect containerid中label数据
 	putIfNotEmpty(c, "k8s_pod", labels[LABEL_POD])
 	putIfNotEmpty(c, "k8s_pod_namespace", labels[LABEL_K8S_POD_NAMESPACE])
 	putIfNotEmpty(c, "k8s_container_name", labels[LABEL_K8S_CONTAINER_NAME])
 	putIfNotEmpty(c, "k8s_node_name", os.Getenv("NODE_NAME"))
 	putIfNotEmpty(c, "docker_container", strings.TrimPrefix(containerJSON.Name, "/"))
-	extension(c, containerJSON)
+	//extension(c, containerJSON)
 	return c
 }
 
@@ -357,6 +369,7 @@ func (p *Pilot) newContainer(containerJSON *types.ContainerJSON) error {
 
 	for _, e := range env {
 		for _, prefix := range p.logPrefix {
+			//处理aliyun_logs_custom_config前缀的
 			customConfig := fmt.Sprintf(ENV_SERVICE_LOGS_CUSTOME_CONFIG_TEMPL, prefix)
 			if strings.HasPrefix(e, customConfig) {
 				labels[customConfig] = e[len(customConfig)+1:]
@@ -364,10 +377,14 @@ func (p *Pilot) newContainer(containerJSON *types.ContainerJSON) error {
 				continue
 			}
 
+			//跳过环境变量中没有aliyun_logs_前缀的
 			serviceLogs := fmt.Sprintf(ENV_SERVICE_LOGS_TEMPL, prefix)
 			if !strings.HasPrefix(e, serviceLogs) {
 				continue
 			}
+
+			//"aliyun_logs_catalina=stdout",
+			//"aliyun_logs_access=/usr/local/tomcat/logs/catalina.*.log",
 
 			envLabel := strings.SplitN(e, "=", 2)
 			if len(envLabel) == 2 {
@@ -388,7 +405,8 @@ func (p *Pilot) newContainer(containerJSON *types.ContainerJSON) error {
 	}
 
 	// create symlink
-	p.createVolumeSymlink(containerJSON)
+	// no used
+	//p.createVolumeSymlink(containerJSON)
 
 	//pilot.findMounts(logConfigs, jsonLogPath, mounts)
 	//生成配置
@@ -423,7 +441,8 @@ func (p *Pilot) doReload() {
 }
 
 func (p *Pilot) delContainer(id string) error {
-	p.removeVolumeSymlink(id)
+
+	//p.removeVolumeSymlink(id)
 
 	//fixme refactor in the future
 	if p.piloter.Name() == PILOT_FLUENTD {
@@ -435,6 +454,7 @@ func (p *Pilot) delContainer(id string) error {
 			}
 			p.tryReload()
 		}
+		//等待15分钟删除该容器的配置文件
 		time.AfterFunc(15*time.Minute, clean)
 		return nil
 	}
@@ -597,9 +617,9 @@ func (p *Pilot) parseLogConfig(name string, info *LogInfoNode, jsonLogPath strin
 
 	if path == "stdout" {
 		logFile := filepath.Base(jsonLogPath)
-		if p.piloter.Name() == PILOT_FILEBEAT {
+		/*if p.piloter.Name() == PILOT_FILEBEAT {
 			logFile = logFile + "*"
-		}
+		}*/
 
 		return &LogConfig{
 			Name:         name,
@@ -690,6 +710,7 @@ func (p *Pilot) getLogConfigs(jsonLogPath string, mounts []types.MountPoint, lab
 
 	mountsMap := make(map[string]types.MountPoint)
 	for _, mount := range mounts {
+		//Destination: 容器内日志目录
 		mountsMap[mount.Destination] = mount
 	}
 
@@ -705,6 +726,8 @@ func (p *Pilot) getLogConfigs(jsonLogPath string, mounts []types.MountPoint, lab
 	root := newLogInfoNode("")
 	for _, k := range labelNames {
 		for _, prefix := range p.logPrefix {
+
+			//处理custom label
 			customConfig := fmt.Sprintf(ENV_SERVICE_LOGS_CUSTOME_CONFIG_TEMPL, prefix)
 			if customConfig == k {
 				configs := strings.Split(labels[k], "\n")
@@ -735,7 +758,7 @@ func (p *Pilot) getLogConfigs(jsonLogPath string, mounts []types.MountPoint, lab
 		if err != nil {
 			return nil, err
 		}
-		CustomConfig(name, customConfigs, logConfig)
+		//CustomConfig(name, customConfigs, logConfig)
 		ret = append(ret, logConfig)
 	}
 	return ret, nil
@@ -754,9 +777,6 @@ func (p *Pilot) render(containerId string, container map[string]string, configLi
 	}
 
 	output := os.Getenv(ENV_FLUENTD_OUTPUT)
-	if p.piloter.Name() == PILOT_FILEBEAT {
-		output = os.Getenv(ENV_FILEBEAT_OUTPUT)
-	}
 	if output == "" {
 		output = os.Getenv(ENV_LOGGING_OUTPUT)
 	}
@@ -788,7 +808,7 @@ func (p *Pilot) reload() error {
 	return err
 }
 
-func (p *Pilot) createVolumeSymlink(containerJSON *types.ContainerJSON) error {
+/*func (p *Pilot) createVolumeSymlink(containerJSON *types.ContainerJSON) error {
 	if !p.createSymlink {
 		return nil
 	}
@@ -839,9 +859,9 @@ func (p *Pilot) createVolumeSymlink(containerJSON *types.ContainerJSON) error {
 		}
 	}
 	return nil
-}
+}*/
 
-func (p *Pilot) removeVolumeSymlink(containerId string) error {
+/*func (p *Pilot) removeVolumeSymlink(containerId string) error {
 	if !p.createSymlink {
 		return nil
 	}
@@ -857,4 +877,4 @@ func (p *Pilot) removeVolumeSymlink(containerId string) error {
 		}
 	}
 	return nil
-}
+}*/

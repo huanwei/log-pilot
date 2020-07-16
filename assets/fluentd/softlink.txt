@@ -1,0 +1,19 @@
+
+[root@10 ~]# ls -al /var/log/pods/d9ff9d69-c595-11ea-92c6-00505692039f/tomcat/
+total 0
+drwxr-xr-x 2 root root  19 Jul 14 13:49 .
+drwxr-xr-x 3 root root  20 Jul 14 13:49 ..
+lrwxrwxrwx 1 root root 165 Jul 14 13:49 0.log -> /var/lib/docker/containers/e9c10e2009bde307920330dc86aa812f6113172366e46bad5105502edad68355/e9c10e2009bde307920330dc86aa812f6113172366e46bad5105502edad68355-json.log
+[root@10 ~]#
+
+[root@10 ~]# tail -f /var/log/pods/d9ff9d69-c595-11ea-92c6-00505692039f/tomcat/0.log
+{"log":"14-Jul-2020 05:50:01.090 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/docs has finished in 22 ms\n","stream":"stderr","time":"2020-07-14T05:50:01.0905767Z"}
+{"log":"14-Jul-2020 05:50:01.090 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /usr/local/tomcat/webapps/examples\n","stream":"stderr","time":"2020-07-14T05:50:01.090594755Z"}
+{"log":"14-Jul-2020 05:50:01.344 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/examples has finished in 254 ms\n","stream":"stderr","time":"2020-07-14T05:50:01.344860658Z"}
+{"log":"14-Jul-2020 05:50:01.344 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /usr/local/tomcat/webapps/host-manager\n","stream":"stderr","time":"2020-07-14T05:50:01.344893806Z"}
+{"log":"14-Jul-2020 05:50:01.375 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/host-manager has finished in 30 ms\n","stream":"stderr","time":"2020-07-14T05:50:01.375846801Z"}
+{"log":"14-Jul-2020 05:50:01.375 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /usr/local/tomcat/webapps/manager\n","stream":"stderr","time":"2020-07-14T05:50:01.375881144Z"}
+{"log":"14-Jul-2020 05:50:01.399 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/manager has finished in 24 ms\n","stream":"stderr","time":"2020-07-14T05:50:01.399810034Z"}
+{"log":"14-Jul-2020 05:50:01.403 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler [\"http-apr-8080\"]\n","stream":"stderr","time":"2020-07-14T05:50:01.403350716Z"}
+{"log":"14-Jul-2020 05:50:01.413 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler [\"ajp-apr-8009\"]\n","stream":"stderr","time":"2020-07-14T05:50:01.414139404Z"}
+{"log":"14-Jul-2020 05:50:01.416 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in 796 ms\n","stream":"stderr","time":"2020-07-14T05:50:01.416393055Z"}

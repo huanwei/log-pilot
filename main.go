@@ -7,12 +7,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	//"path/filepath"
 )
 
 func main() {
 
-	template := flag.String("template", "", "Template filepath for fluentd or filebeat.")
-	base := flag.String("base", "", "Directory which mount host root.")
+	template := flag.String("template", "/pilot/fluentd.tpl", "Template filepath for fluentd or filebeat.")
+	base := flag.String("base", "/host", "Directory which mount host root.")
 	level := flag.String("log-level", "INFO", "Log level")
 	flag.Parse()
 
